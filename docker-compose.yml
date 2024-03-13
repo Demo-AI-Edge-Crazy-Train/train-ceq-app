@@ -103,24 +103,3 @@ services:
     depends_on:
       kafka:
         condition: service_started
-
-
-  # prometheus:
-  #   image: prom/prometheus:v2.8.0
-  #   volumes:
-  #     - ./podman-compose/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #   ports:
-  #     - '9090:9090'
-  #   depends_on:
-  #     - hello
-  # grafana:
-  #   image: grafana/grafana:6.6.1
-  #   depends_on:
-  #     - prometheus
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./podman-compose/grafana/provisioning/:/etc/grafana/provisioning/
-  #     - ./podman-compose/grafana/grafana.ini:/etc/grafana/grafana.ini
