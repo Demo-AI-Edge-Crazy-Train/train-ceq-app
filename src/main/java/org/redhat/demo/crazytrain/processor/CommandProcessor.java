@@ -24,7 +24,7 @@ public class CommandProcessor implements Processor{
     @Override
     public void process(Exchange exchange) throws Exception {
         String classId = null;
-        //LOGGER.infof("Received : '%s'",exchange.getIn().getBody().toString());
+        LOGGER.debugf("Received : '%s'",exchange.getIn().getBody().toString());
         Result result = (Result) exchange.getIn().getBody();
         ArrayList<Detection> detections = result.getDetections();
         

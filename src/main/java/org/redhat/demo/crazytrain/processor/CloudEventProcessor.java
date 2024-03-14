@@ -20,7 +20,6 @@ import io.cloudevents.core.builder.CloudEventBuilder;
 import java.net.URI;
 import java.util.UUID;
 import org.apache.camel.Processor;
-import org.apache.camel.console.DevConsole.MediaType;
 
 @Named("CloudEventProcessor") 
 @ApplicationScoped
@@ -29,7 +28,7 @@ public class CloudEventProcessor implements Processor{
     @Override
     public void process(Exchange exchange) throws Exception {
         String message = exchange.getIn().getBody().toString();
-       // System.out.println("Received : "+message);
+        LOGGER.debug("Received : "+message);
         
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = null;
@@ -37,7 +36,7 @@ public class CloudEventProcessor implements Processor{
         ObjectNode node = null;
 		try {
 			jsonNode = mapper.readTree(message);
-            //LOGGER.infof("Json Node  : '%s'",jsonNode.toString());
+            LOGGER.debugf("Json Node  : '%s'",jsonNode.toString());
             ObjectMapper mp = new ObjectMapper();
             node = mp.createObjectNode()
                 .put("id", UUID.randomUUID().toString())
@@ -51,7 +50,7 @@ public class CloudEventProcessor implements Processor{
         } catch (Exception e) {
             LOGGER.error("Error processing message", e);
         }
-        //LOGGER.infof("CloudEvent : '%s'",no.toString());
+        LOGGER.debugf("CloudEvent : '%s'",no.toString());
 
         exchange.getIn().setBody(no.toString());
 
