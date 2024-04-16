@@ -39,33 +39,39 @@ public class CloudEventProcessor implements Processor{
     @Override
     public void process(Exchange exchange) throws Exception {
         String message = exchange.getIn().getBody().toString();
-        LOGGER.debugf("Received : "+message);
+        LOGGER.infof("Received : "+message);
         
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = null;
         JsonNode no = null;
         JsonNode data = null;
         ObjectNode node = null;
+        String base64ImageResult = null;
 		try {
 			data = mapper.readTree(message);
             String imageBytesBase64  = data.get("image").asText();
-            byte[] imageBytes = Base64.getDecoder().decode(imageBytesBase64.substring(imageBytesBase64.indexOf(",")+1));
-            Mat image = new Mat(480, 640, CvType.CV_8UC3);
-            image.put(0, 0, imageBytes);
+            // Mat image = new Mat(480, 640, CvType.CV_8UC3);
+            // image.put(0, 0, imageBytes);
             JsonNode detections  = data.get("detections");
-            if(detections != null){
+            if(detections != null && detections.size()>0 && detections.isArray()){
+                byte[] imageBytes = Base64.getDecoder().decode(imageBytesBase64);
+                    // Convert the byte array into a MatOfByte
+                MatOfByte matOfByte = new MatOfByte(imageBytes);
+                // Decode the MatOfByte into a Mat
+                Mat image = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_UNCHANGED);
                 image = addSquareToimage(image, detections);
-            }
-            MatOfByte matOfByte = new MatOfByte();
-             // Convert the Mat object to a WEBP image
-            Imgcodecs.imencode(".webp", image, matOfByte, new MatOfInt(Imgcodecs.IMWRITE_WEBP_QUALITY, 80));
-            // Convert the MatOfByte to a byte array
-            byte[] imgBytes = matOfByte.toArray();
-            String base64Image = Base64.getEncoder().encodeToString(imgBytes);
-            LOGGER.debugf("Base64 Image : '%d'",base64Image.length());
+                MatOfByte matOfByteReduced = new MatOfByte();
+                // Convert the Mat object to a WEBP image
+               Imgcodecs.imencode(".webp", image, matOfByteReduced, new MatOfInt(Imgcodecs.IMWRITE_WEBP_QUALITY, 80));
+                // Convert the MatOfByte to a byte array
+                byte[] imgBytes = matOfByteReduced.toArray();
+                base64ImageResult = Base64.getEncoder().encodeToString(imgBytes);
+            } else  base64ImageResult = imageBytesBase64;
+        
+            LOGGER.infof("Base64 Image : '%d'",base64ImageResult.length());
             LOGGER.debug("Length of Data before deep copy "+data.toString().length());
             data = data.deepCopy();
-            ((ObjectNode)data).put("image", "data:image/webp;base64,"+base64Image);
+            ((ObjectNode)data).put("image", "data:image/webp;base64,"+base64ImageResult);
             if(data == null)
                 LOGGER.debug("Data is null");
             else LOGGER.debugf("Length of Data after copy image : '%d'",data.toString().length());
