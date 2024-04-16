@@ -4,6 +4,7 @@ import org.jboss.logging.Logger;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -56,15 +57,18 @@ public class CloudEventProcessor implements Processor{
                 image = addSquareToimage(image, detections);
             }
             MatOfByte matOfByte = new MatOfByte();
-             // Convert the Mat object to a JPEG image
-            Imgcodecs.imencode(".webp", image, matOfByte);
+             // Convert the Mat object to a WEBP image
+            Imgcodecs.imencode(".webp", image, matOfByte, new MatOfInt(Imgcodecs.IMWRITE_WEBP_QUALITY, 80));
             // Convert the MatOfByte to a byte array
             byte[] imgBytes = matOfByte.toArray();
             String base64Image = Base64.getEncoder().encodeToString(imgBytes);
-            LOGGER.infof("Base64 Image : '%d'",base64Image.length());
-            //data = data.deepCopy();
+            LOGGER.debugf("Base64 Image : '%d'",base64Image.length());
+            LOGGER.debug("Length of Data before deep copy "+data.toString().length());
+            data = data.deepCopy();
             ((ObjectNode)data).put("image", "data:image/webp;base64,"+base64Image);
-            //LOGGER.debugf("Json Node  : '%s'",jsonNode.toString());
+            if(data == null)
+                LOGGER.debug("Data is null");
+            else LOGGER.debugf("Length of Data after copy image : '%d'",data.toString().length());
             ObjectMapper mp = new ObjectMapper();
             node = mp.createObjectNode()
                 .put("id", UUID.randomUUID().toString())
