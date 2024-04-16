@@ -39,7 +39,7 @@ public class CloudEventProcessor implements Processor{
     @Override
     public void process(Exchange exchange) throws Exception {
         String message = exchange.getIn().getBody().toString();
-        LOGGER.infof("Received : "+message);
+        LOGGER.debugf("Received : "+message);
         
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = null;
@@ -50,8 +50,6 @@ public class CloudEventProcessor implements Processor{
 		try {
 			data = mapper.readTree(message);
             String imageBytesBase64  = data.get("image").asText();
-            // Mat image = new Mat(480, 640, CvType.CV_8UC3);
-            // image.put(0, 0, imageBytes);
             JsonNode detections  = data.get("detections");
             if(detections != null && detections.size()>0 && detections.isArray()){
                 byte[] imageBytes = Base64.getDecoder().decode(imageBytesBase64);
@@ -68,7 +66,7 @@ public class CloudEventProcessor implements Processor{
                 base64ImageResult = Base64.getEncoder().encodeToString(imgBytes);
             } else  base64ImageResult = imageBytesBase64;
         
-            LOGGER.infof("Base64 Image : '%d'",base64ImageResult.length());
+            LOGGER.debugf("Base64 Image : '%d'",base64ImageResult.length());
             LOGGER.debug("Length of Data before deep copy "+data.toString().length());
             data = data.deepCopy();
             ((ObjectNode)data).put("image", "data:image/webp;base64,"+base64ImageResult);
