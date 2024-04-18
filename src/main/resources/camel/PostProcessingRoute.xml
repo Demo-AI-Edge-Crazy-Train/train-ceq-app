@@ -1,7 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
 
     
-    <route id="postprossing-route">  
+    <route id="postproscesing-route">  
         <from uri="paho:{{train.mqtt.source.topicName}}?brokerUrl={{train.mqtt.brokerUrl}}"/>     
         <log loggingLevel="DEBUG" message="MQTT message received:"/>
         <log loggingLevel="DEBUG" message="${body}"/>
@@ -21,6 +21,9 @@
         <toD uri="kafka:{{monitoring.kafka.destination.topicName}}?brokers={{train.kafka.brokerUrl}}"/>
         <log loggingLevel="DEBUG" message="written into kafka"/>
     </route>
-
-
+    <route id="command-capture-image">
+        <from uri="kafka:{{monitoring.kafka.source.topicName}}?brokers={{train.kafka.brokerUrl}}"/>
+        <setHeader name="command"><jsonpath>$.command</jsonpath></setHeader>
+        <toD uri="{{train.http.url}}/${header.command}" />
+    </route>
 </routes>
