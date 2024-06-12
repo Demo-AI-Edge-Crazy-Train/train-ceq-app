@@ -24,6 +24,6 @@
     <route id="command-capture-image">
         <from uri="kafka:{{monitoring.kafka.source.topicName}}?brokers={{train.kafka.brokerUrl}}"/>
         <setHeader name="command"><jsonpath>$.command</jsonpath></setHeader>
-        <toD uri="{{train.http.url}}/${header.command}" />
+        <toD uri="{{train.http.url}}/${header.command}?httpMethod=POST" />
     </route>
 </routes>
