@@ -1,6 +1,4 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-
-    
     <route id="postproscesing-route">  
         <from uri="paho:{{train.mqtt.source.topicName}}?brokerUrl={{train.mqtt.brokerUrl}}"/>     
         <log loggingLevel="DEBUG" message="MQTT message received:"/>
