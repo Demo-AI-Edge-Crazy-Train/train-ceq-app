@@ -8,12 +8,6 @@ Train-CEQ-App is a module in a larger system that is responsible for post-proces
 
 ## How it works
 
-# Train-CEQ-App
-
-Train-CEQ-App is a module in a larger system that is responsible for managing the Comfort, Entertainment, and Quality (CEQ) aspects of the train service.
-
-## How it works
-
 Train-CEQ-App receives prediction data from the Intelligent-Train module via MQTT. It processes this data, performing post-processing operations such as filtering, aggregation, and interpretation to transform the raw predictions into actionable insights. These insights are used to make decisions to control the train service. These decisions are then sent to the Train-Controller module.
 
 Train-CEQ-App receives prediction data from the Intelligent-Train module via MQTT. It processes this data, performing post-processing operations such as filtering, aggregation, and interpretation to transform the raw predictions into actionable insights. These insights, along with the original images, are packaged as a CloudEvent and sent to the Train-Monitoring-App module via Kafka. The Train-Monitoring-App module uses this information for monitoring and visualization purposes. Decisions are sent to the Train-Controller module through MQTT.
